@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechStore SESI </title>
+    <title>TechStore SESI</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>TechStore SESI</h1>
-        
-        <section class="Formulario">
-            <h3>Dados Da Venda</h3>
-            <input type="text" id="inputNome" placeholder="Nome do Cliente" >
-            <input type="number" id="inputIdade" placeholder="Idade do Cliente">
-            <input type="number" id="inputValor" placeholder="Valor Total (R$)">
+   <div class="container">
+       <h1>TechStore SESI</h1>
 
-            <select id="inputCupom">
-                <option value="false"> Não possui cupom</option>
-                <option value="true"> Possui cupom (15% OFF)</option>
-            </select>
+       <section class="formulario">
+           <h3>Dados da Venda</h3>
+           <input type="text" id="inputNome" placeholder="Nome do Cliente">
+           <input type="number" id="InputIdade" placeholder="Idade do Cliente">
+           <input type="number" id="inputValor" placeholder="Valor Total(R$)">
 
-            <button onclick="executarSistema()">Finalizar Venda</button>
+           <select id="inputCupom">
+               <option value="false">Não possui cupom</option>
+               <option value="true">Possui cupom (15% OFF)</option>
+           </select>
+
+           <button onclick="executarSistema()">Finalizar Venda</button>
         </section>
 
         <hr>
@@ -33,7 +33,6 @@
             </div>
         </section>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
