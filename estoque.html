@@ -1,0 +1,307 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estoque - TechStore SESI</title>
+<link rel="stylesheet" href="estoque.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>TechStore SESI</h1>
+    <div class="topo">
+        <p class="subtitulo">Controle de Estoque</p>
+    
+        <input
+            type="text"
+            id="pesquisa"
+            placeholder="Pesquisar produto..."
+        >
+    </div>
+    <div class="cards">
+    </div>
+    
+    <button id="adicionarProduto">
+        + Novo Produto
+    </button>
+    
+    <a href="index.html">
+        <button type="button">Voltar para os pedidos</button>
+    </a>
+
+    <button id="excluirProdutoBtn">
+        Excluir Produto
+    </button>
+</div>
+
+<script>
+
+    let estoque = JSON.parse(localStorage.getItem("estoque")) || {};
+    
+    function selecionarProduto(nome, valor){
+    
+        if (estoque[nome] <= 0){
+            alert("Produto sem estoque!");
+            return;
+        }
+    
+        estoque[nome]--;
+    
+        localStorage.setItem(
+            "estoque",
+            JSON.stringify(estoque)
+        );
+    
+        // Salva o nome do produto
+        localStorage.setItem(
+            "produtoSelecionado",
+            nome
+        );
+    
+        // Salva o preço do produto
+        localStorage.setItem(
+            "precoSelecionado",
+            valor
+        );
+    
+        // Vai para a página principal
+        window.location.href = "index.html";
+    }
+    function adicionarEstoque(event, nome) {
+
+event.stopPropagation();
+
+if (estoque[nome] !== undefined) {
+
+    estoque[nome]++;
+
+    localStorage.setItem(
+        "estoque",
+        JSON.stringify(estoque)
+    );
+
+} else {
+
+    let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
+
+    const produto = produtos.find(
+        p => p.nome === nome
+    );
+
+    if (produto) {
+        produto.estoque = Number(produto.estoque) + 1;
+    }
+
+    localStorage.setItem(
+        "produtos",
+        JSON.stringify(produtos)
+    );
+}
+
+location.reload();
+}
+    </script>
+    <script>
+    const produtos = JSON.parse(localStorage.getItem("produtos")) || [];
+
+    function renderizarProdutos() {
+
+const container = document.querySelector(".cards");
+
+produtos.forEach(produto => {
+
+    const card = document.createElement("div");
+card.classList.add("card");
+
+card.onclick = function() {
+
+    if (produto.estoque <= 0) {
+        alert("Produto sem estoque!");
+        return;
+    }
+
+    produto.estoque--;
+
+    console.log(produtos);
+
+    localStorage.setItem(
+        "produtos",
+        JSON.stringify(produtos)
+    );
+
+    localStorage.setItem(
+        "produtoSelecionado",
+        produto.nome
+    );
+
+    localStorage.setItem(
+        "precoSelecionado",
+        produto.preco
+    );
+
+    window.location.href = "index.html";
+};
+
+    card.innerHTML = `
+        <h2>${produto.nome}</h2>
+        <div class="info">Nome: ${produto.nome}</div>
+        <div class="info">Categoria: ${produto.categoria}</div>
+        <div class="info">
+        Preço: R$ ${Number(produto.preco).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+        })}
+        </div>
+        <div class="quantidade ${
+        produto.estoque <= 5 ? "baixo" : "normal"
+        }">
+        Estoque: ${produto.estoque} unidades
+        </div>
+       <button onclick="event.stopPropagation(); adicionarEstoque(event,'${produto.nome}')">
+        + Estoque
+        </button>
+        <button onclick="event.stopPropagation(); removerEstoque('${produto.nome}')">
+        - Estoque
+        </button>
+    `;
+
+    container.appendChild(card);
+});
+}
+function removerEstoque(nome){
+
+let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
+
+const produto = produtos.find(
+    p => p.nome === nome
+);
+
+if(produto && produto.estoque > 0){
+    produto.estoque--;
+}
+
+localStorage.setItem(
+    "produtos",
+    JSON.stringify(produtos)
+);
+
+location.reload();
+}
+    document.getElementById("adicionarProduto").addEventListener("click", () => {
+    
+       
+    
+        const nome = prompt("Nome:");
+        const categoria = prompt("Categoria:");
+        const preco = prompt("Preço:");
+        const qtd = prompt("Quantidade em estoque:");
+
+        if(!nome || !categoria || !preco || !qtd){
+    return;
+}
+        console.log("Preço digitado:", preco);
+    produtos.push({
+    nome,
+    categoria,
+    preco: Number(preco.replace(",", ".")),
+    estoque: Number(qtd)
+    });
+    console.log(produtos);
+    
+        localStorage.setItem(
+            "produtos",
+            JSON.stringify(produtos)
+        );
+    
+        location.reload();
+    });
+    
+    renderizarProdutos()
+
+    document.getElementById("excluirProdutoBtn")
+.addEventListener("click", () => {
+
+    let produtos =
+        JSON.parse(localStorage.getItem("produtos")) || [];
+
+    if(produtos.length === 0){
+        alert("Não há produtos cadastrados!");
+        return;
+    }
+
+    let nomes = produtos.map(
+    (p, i) => `${i + 1} - ${p.nome}`
+).join("\n");
+
+let nome = prompt(
+    "Digite o NÚMERO do produto que deseja excluir:\n\n" +
+    nomes
+);
+
+    if(!nome){
+        return;
+    }
+
+    const indice = Number(nome) - 1;
+
+if(indice < 0 || indice >= produtos.length){
+    alert("Produto inválido!");
+    return;
+}
+
+const produto = produtos[indice];
+
+    if(!produto){
+        alert("Produto não encontrado!");
+        return;
+    }
+
+    const confirmar = confirm(
+        `Tem certeza que deseja excluir "${produto.nome}"?`
+    );
+
+    if(!confirmar){
+        return;
+    }
+
+    produtos.splice(indice, 1);
+
+    localStorage.setItem(
+        "produtos",
+        JSON.stringify(produtos)
+    );
+
+    location.reload();
+});
+</script>
+<script>
+    document.getElementById("pesquisa")
+.addEventListener("input", function(){
+
+    const texto = this.value.toLowerCase();
+
+    document.querySelectorAll(".card")
+    .forEach(card => {
+
+        const nome = card.querySelector("h2")
+        .innerText.toLowerCase();
+
+        card.style.display =
+            nome.includes(texto)
+            ? "block"
+            : "none";
+    });
+});
+</script>
+
+
+</body>
+</html>
+
+
+
+
+

@@ -1,72 +1,56 @@
-function executarSistema() {
+function executarSistema(){
+    // Dados de entrada
+    const nome = document.getElementById("inputNome").value;
+    const idade = parseInt(document.getElementById("inputIdade").value);
+    const cupom = document.getElementById("inputCupom").value === "true";
 
-    //Tratamento de erros para o sistema não quebrar
-    try {
-        // Dados de entrada
-        const inputNome = document.getElementById("inputNome");
-        const inputIdade = document.getElementById("inputIdade");
-        const inputValor = document.getElementById("inputValor");
-        const inputCupom = document.getElementById("inputCupom");
+    const valor = Number(
+        localStorage.getItem("precoSelecionado")
+    );
 
-        // Dados de saída
-        const msg = document.getElementById("mensagem-autorizacao");
-        const lista = document.getElementById("lista-estoque");
-        const relatorio = document.getElementById("relatorio-final");
-        
-        const btn =document.getElementById("btnFinalizar");
+    // Dados de saída
+    const msg = document.getElementById("mensagem-autorizacao");
+    const lista = document.getElementById("lista-estoque");
+    const relatorio = document.getElementById("relatorio-final");
 
-        btn.disable = true;
-        btn.innerText = "Processando..."; 
+    // Validação para campos vazios
+    if (!nome || isNaN(idade)) {
+        alert("coloque seus dados!");
+        return;
+    }
 
-        //trin() remove os espaços branco
-        const nome = inputNome.value.trim();
-        const idade = parseInt(inputIdade.value);
-        const valor = parseFloat(inputValor.value);
-        const cupom = inputCupom.value === "true";
+    // Regra de negócio
+    if(idade >=16){
+        msg.innerText = `Venda Autorizada: ${nome}`;
+        msg.style.color = "#00ff88";
 
-        //  Validação para campos vazios
-        if (!nome || isNaN(idade) || isNaN(valor)) {
-            msg.innerText = "Preencha todos os campos corretamente!"
-            msg.style.color = "#ff4444"
-            return;
-        }
+        // Desconto
+        let valorFinal = (valor > 500 || cupom) ? valor *0.85 : valor;
 
-        // Regra de negócio
-        if (idade >= 16) {
-            msg.innerText = `Venda autorizada: ${nome}`;
-            msg.style.color = "#00ff88";
+    // Estoque
+    let estoque = ["Placa de Vídeo", "Processador", "Memória Ram"];
+    lista.innerHTML = ""; // Limpa e lista Anterior
 
-            // Desconto
-            let valorFinal = (valor > 500 || cupom) ? valor * 0.85 : valor;
+    //forEach:percorre um arraye aolica uma ação apta cada elemento
+    estoque.forEach(item => {
+        let li = document.createElement("li");
+        li.innerText = `Item ${item} reservado.`;
+        lista.appendChild(li);//usando para adicionar um novo elemento ou texto
+    });
 
-            // Estoque
-            let estoque = ["Placa de Vídeo", "Processador", "Memória RAM"];
-            lista.innerHTML = ""; // Limpa a lista anterior
-
-            // forEach: Percorre um array e aplica um ação para cada elemento
-            estoque.forEach(item => {
-                let li = document.createElement("li");
-                li.innerText = `Item ${item} reservado.`;
-                lista.appendChild(li); // usado para adicionar um novo elemento ou texto
-            });
-
-            // Relatório
-            relatorio.style.display = "block";
-            relatorio.innerHTML = `
-        <strong> RESUMO DO PEDIDO <\strong><br>
-        Cliente: ${nome} <br>
-        Total Original: R$ ${valor.toFixed(2)} <br>
-        <strong> Total com Desconto: R$ ${valorFinal.toFixed(2)} <\strong>
-        `;
-        } else {
-            msg.innerText = "Venda bloqueada: Menor de 16 anos.";
-            msg.style.color = "#ff4444";
-            relatorio.style.display = "none";
-            lista.innerHTML = "";
-        }
-
-    } catch (error) {
-
+    relatorio.style.display = "block";
+    relatorio.innerHTML = `
+    <strong> Resumo do Pedido </strong><br>
+    Cliente: ${nome} <br>
+    Total Original: R$ ${valor.toFixed(2)} <br>
+    <strong> Total com Desconto: R$ ${valorFinal.toFixed(2)} </strong>
+    `;
+    }else{
+        msg.innerText = "Venda bloqueada: Menor de 16 anos.";
+        msg.style.color = "#ff4444";
+        relatorio.style.display = "none";
+        lista.innerHTML = "";
     }
 }
+
 
